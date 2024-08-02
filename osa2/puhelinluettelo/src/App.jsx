@@ -135,7 +135,7 @@ const App = () => {
           setNewNumber('')
         })
         .catch(error => {
-          showNotification(error, 'error') // Manipulated later in exercise 3.19
+          showNotification(error.response.data.error, 'error') // Manipulated later in exercise 3.19
         })
     }
 
