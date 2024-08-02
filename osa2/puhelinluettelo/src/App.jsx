@@ -135,7 +135,7 @@ const App = () => {
           setNewNumber('')
         })
         .catch(error => {
-          showNotification(`Failed to add ${newName}`, 'error')
+          showNotification(error, 'error') // Manipulated later in exercise 3.19
         })
     }
 
