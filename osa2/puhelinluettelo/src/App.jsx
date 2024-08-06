@@ -114,7 +114,8 @@ const App = () => {
               setNewNumber('');
             })
             .catch(error => {
-              showNotification(`Information of ${name} has already been removed from server`, 'error')
+              showNotification(error.response.data.error, 'error')
+              // showNotification(`Information of ${name} has already been removed from server`, 'error') // Manipulated in later exercise 3.19
             });
         }
       } else {
@@ -135,7 +136,7 @@ const App = () => {
           setNewNumber('')
         })
         .catch(error => {
-          showNotification(error.response.data.error, 'error') // Manipulated later in exercise 3.19
+          showNotification(error.response.data.error, 'error') // Manipulated in later exercise 3.19
         })
     }
 
