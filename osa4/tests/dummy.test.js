@@ -133,3 +133,26 @@ describe('author with most blogs', () => {
         })
     })
 })
+
+describe('author with most likes', () => {
+    test('empty list returns null', () => {
+        const result = listHelper.mostBlogs(emptyList)
+        assert.strictEqual(result, null)
+    })
+
+    test('list with one blog returns that author', () => {
+        const result = listHelper.mostBlogs(listWithOneBlog)
+        assert.notStrictEqual(result, {
+            author: listWithOneBlog[0].author,
+            likes: listWithOneBlog[0].likes
+        })
+    })
+
+    test('many blogs', () => {
+        const result = listHelper.mostBlogs(blogs)
+        assert.notStrictEqual(result, {
+            author: "Edsger W. Dijkstra",
+            likes: 17
+        })
+    })
+})
