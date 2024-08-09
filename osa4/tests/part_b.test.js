@@ -1,4 +1,4 @@
-const { test, after, beforeEach } = require('node:test')
+const { describe, test, after, beforeEach } = require('node:test')
 const assert = require('node:assert')
 const helper = require('./test_helper')
 const mongoose = require('mongoose')
@@ -57,6 +57,65 @@ test('creation of a new blog is possible', async () => {
   
   assert.strictEqual(response.body.length, helper.initBlogs.length + 1)
   assert(titles.includes(title))
+})
+
+// 4.11*
+test('value of likes is set to 0 if a value is not given', async () => {
+  // Blog is missing value for likes
+  const flawedBlog = {
+    title: 'This blog is flawed',
+    author: 'Aappo Alatalo',
+    url: 'bebebeb//::htmljeeejee',
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(flawedBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const response = await api.get('/api/blogs')
+  const likesArray = response.body.map(r => r.likes)
+  assert(!likesArray.includes(undefined))
+})
+
+// 4.12*
+describe('POST request fails if', () => {
+  test('title is missing', async () => {
+      // Blog is missing value for title
+      const flawedBlog = {
+        author: 'Aappo Alatalo',
+        url: 'bebebeb//::htmljeeejee',
+        likes: 4
+      }
+      await api
+        .post('/api/blogs')
+        .send(flawedBlog)
+        .expect(400)
+  })
+  test('url is missing', async () => {
+    // Blog is missing value for url
+    const flawedBlog = {
+      title: 'flawed blog',
+      author: 'Aappo Alatalo',
+      likes: 4
+    }
+    await api
+      .post('/api/blogs')
+      .send(flawedBlog)
+      .expect(400)
+  })
+  test('title AND url are missing', async () => {
+    // Blog is missing value for title and url
+    const flawedBlog = {
+      author: 'Aappo Alatalo',
+      likes: 4
+    }
+    await api
+      .post('/api/blogs')
+      .send(flawedBlog)
+      .expect(400)
+  })
 })
 
 after(async () => {
