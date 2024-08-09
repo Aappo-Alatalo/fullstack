@@ -36,6 +36,29 @@ test('blog identifier name is "id"', async () => {
   })
 })
 
+test('creation of a new blog is possible', async () => {
+  const title = 'test blog'
+  const newBlog = {
+    title: title,
+    author: 'Aappo Alatalo',
+    url: 'bebebeb//::htmljeeejee',
+    likes: 1
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const response = await api.get('/api/blogs')
+
+  const titles = response.body.map(r => r.title)
+  
+  assert.strictEqual(response.body.length, helper.initBlogs.length + 1)
+  assert(titles.includes(title))
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
