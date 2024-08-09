@@ -132,6 +132,31 @@ test('deletion of a blog', async () => {
   assert.strictEqual(blogsAfterDelete.length, helper.initBlogs.length - 1)
 })
 
+// 4.14*
+test('put request can edit blogs (add a like)', async () => {
+  const blogsBefore = await helper.blogsInDb()
+  const blogToEdit = blogsBefore[0]
+
+  const editedBlog = {
+    title: blogToEdit.title,
+    author: blogToEdit.author,
+    url: blogToEdit.url,
+    likes: blogToEdit.likes + 1 
+  }
+
+  const response = await api
+    .put(`/api/blogs/${blogToEdit.id}`)
+    .send(editedBlog)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+  assert.strictEqual(response.body.likes, editedBlog.likes)
+
+  const blogsAfterEdit = await helper.blogsInDb()
+  const editedBlogInDb = blogsAfterEdit.find(blog => blog.id === blogToEdit.id)
+  assert.strictEqual(editedBlogInDb.likes, editedBlog.likes)
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
