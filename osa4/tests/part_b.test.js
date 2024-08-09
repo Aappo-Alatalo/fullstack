@@ -118,6 +118,20 @@ describe('POST request fails if', () => {
   })
 })
 
+// 4.13
+test('deletion of a blog', async () => {
+  const blogsBefore = await helper.blogsInDb()
+  const blogToDelete = blogsBefore[0]
+
+  await api
+    .delete(`/api/blogs/${blogToDelete.id}`)
+    .expect(204)
+
+  const blogsAfterDelete = await helper.blogsInDb()
+
+  assert.strictEqual(blogsAfterDelete.length, helper.initBlogs.length - 1)
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
