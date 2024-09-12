@@ -5,6 +5,10 @@ import loginService from './services/login'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
+  const [newBlogTitle, setNewBlogTitle] = useState('')
+  const [newBlogAuthor, setNewBlogAuthor] = useState('')
+  const [newBlogURL, setNewBlogURL] = useState('')
+  const [errorMessage, setErrorMessage] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('') 
   const [user, setUser] = useState(null)
@@ -51,6 +55,22 @@ const App = () => {
     }
   }
 
+  const addBlog = async (event) => {
+    event.preventDefault()
+
+    const blogObject = {
+      title: newBlogTitle,
+      author: newBlogAuthor,
+      url: newBlogURL,
+    }
+    
+    const returnedBlog = await blogService.create(blogObject)
+    setBlogs(blogs.concat(returnedBlog))
+    setNewBlogTitle('')
+    setNewBlogAuthor('')
+    setNewBlogURL('')
+  }
+
   if (user === null) {
     return (
       <div>
@@ -80,15 +100,29 @@ const App = () => {
     )
   }
 
-  const printstuff = () => console.log("button clicked")
-
-
   return (
     <div>
       <h2>blogs</h2>
 
       {user.name} logged in
       <button onClick={() => window.localStorage.clear()}>logout</button>
+
+      <h2>create new</h2>
+      <form onSubmit={addBlog}>
+        <div>
+          title:
+          <input value={newBlogTitle} onChange={() => setNewBlogTitle(event.target.value)}/>
+        </div>
+        <div>
+          author:
+          <input value={newBlogAuthor} onChange={() => setNewBlogAuthor(event.target.value)}/>
+        </div>
+        <div>
+          url:
+          <input value={newBlogURL} onChange={() => setNewBlogURL(event.target.value)}/>
+        </div>
+        <button type='submit'>create</button>
+      </form>
 
       {blogs.map(blog =>
         <Blog key={blog.id} blog={blog} />
