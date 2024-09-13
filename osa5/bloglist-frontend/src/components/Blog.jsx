@@ -26,9 +26,10 @@ const Blog = ({ blog, blogs, setBlogs}) => {
         user: blog.user
       }
 
+      const updatedBlogs = blogs.map(b => b.id === blog.id ? completedBlog : b)
+      const sortedBlogs = updatedBlogs.sort((a, b) => b.likes - a.likes)
       setLikes(likes + 1)
-
-      setBlogs(blogs.map(b => b.id === blog.id ? completedBlog : b))
+      setBlogs(sortedBlogs)
     } catch (error) {
       console.log(error)
     }
