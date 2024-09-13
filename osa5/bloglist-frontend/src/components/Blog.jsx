@@ -14,20 +14,22 @@ const Blog = ({ blog, blogs, setBlogs}) => {
 
   const handleLike = async () => {
     const updatedBlog = {
-      user: blog.user.id,
+      ...blog,
       likes: likes + 1,
-      author: blog.author,
-      title: blog.title,
-      url: blog.url,
     }
 
     try {
       const returnedBlog = await blogService.update(blog.id, updatedBlog)
+      // This is the fix for 5.9*
+      const completedBlog = {
+        ...returnedBlog,
+        user: blog.user
+      }
+
       setLikes(likes + 1)
 
-      setBlogs(blogs.map(b => b.id === blog.id ? returnedBlog : b))
+      setBlogs(blogs.map(b => b.id === blog.id ? completedBlog : b))
     } catch (error) {
-      // console.log('Error updating blog')
       console.log(error)
     }
   }
