@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import Togglable from './components/Togglable'
 import BlogForm from './components/BlogForm'
+import LoginForm from './components/LoginForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -17,44 +18,17 @@ const Notification = ({ message, type }) => {
   )
 }
 
-const LoginForm = ({ handleLogin, username, setUsername, password, setPassword}) => (
-  <div>
-    <h2>Log in to application</h2>
-      <form onSubmit={handleLogin}>
-        <div>
-          username
-            <input
-            type="text"
-            value={username}
-            name="Username"
-            onChange={({ target }) => setUsername(target.value)}
-          />
-        </div>
-        <div>
-          password
-            <input
-            type="password"
-            value={password}
-            name="Password"
-            onChange={({ target }) => setPassword(target.value)}
-          />
-        </div>
-      <button type="submit">login</button>
-    </form>      
-  </div>
-)
-
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [notificationMessage, setNotificationMessage] = useState(null)
   const [notificationType, setNotificationType] = useState(null)
   const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('') 
+  const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
 
   const blogFormRef = useRef()
 
-  
+
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
@@ -80,7 +54,7 @@ const App = () => {
 
   const handleLogin = async (event) => {
     event.preventDefault()
-    
+
     try {
       const user = await loginService.login({
         username, password,
@@ -88,12 +62,12 @@ const App = () => {
 
       window.localStorage.setItem(
         'loggedBlogappUser', JSON.stringify(user)
-      ) 
+      )
       blogService.setToken(user.token)
       setUser(user)
       setUsername('')
       setPassword('')
-    } 
+    }
     catch (exception) {
       setNotificationMessage('wrong username or password')
       setNotificationType('error')
@@ -128,13 +102,13 @@ const App = () => {
     <div>
       <Notification message={notificationMessage} type={notificationType} />
 
-      {!user && 
-        <LoginForm 
-        handleLogin={handleLogin}
-        username={username}
-        setUsername={setUsername}
-        password={password}
-        setPassword={setPassword}
+      {!user &&
+        <LoginForm
+          handleLogin={handleLogin}
+          username={username}
+          setUsername={setUsername}
+          password={password}
+          setPassword={setPassword}
         />
       }
 
@@ -151,7 +125,7 @@ const App = () => {
         {blogs.map(blog =>
           <Blog key={blog.id} blog={blog} blogs={blogs} setBlogs={setBlogs} username={user.username} />
         )}
-        </div>
+      </div>
       }
     </div>
   )
