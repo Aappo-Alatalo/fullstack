@@ -106,7 +106,13 @@ const App = () => {
 
   const addBlog = async (blogObject) => {
     const returnedBlog = await blogService.create(blogObject)
-    setBlogs(blogs.concat(returnedBlog))
+
+    const completedBlog = {
+      ...returnedBlog,
+      user: user
+    }
+
+    setBlogs(blogs.concat(completedBlog))
 
     setNotificationMessage(`a new blog ${blogObject.title} by ${blogObject.author} added`)
     setNotificationType('success')
@@ -143,7 +149,7 @@ const App = () => {
         </Togglable>
 
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} blogs={blogs} setBlogs={setBlogs} />
+          <Blog key={blog.id} blog={blog} blogs={blogs} setBlogs={setBlogs} username={user.username} />
         )}
         </div>
       }
