@@ -2,7 +2,7 @@ import { useState } from 'react'
 import blogService from '../services/blogs'
 import PropTypes from 'prop-types'
 
-const Blog = ({ blog, blogs, setBlogs, username }) => {
+const Blog = ({ blog, blogs, setBlogs, username, handleLike }) => {
   const [visible, setVisible] = useState(false)
   const [likes, setLikes] = useState(blog.likes)
 
@@ -13,7 +13,7 @@ const Blog = ({ blog, blogs, setBlogs, username }) => {
     setVisible(!visible)
   }
 
-  const handleLike = async () => {
+  const defaultHandleLike = async () => {
     const updatedBlog = {
       ...blog,
       likes: likes + 1,
@@ -69,7 +69,7 @@ const Blog = ({ blog, blogs, setBlogs, username }) => {
       <div style={showWhenVisible}>
         <button onClick={toggleVisibility}>hide</button>
         <p>{blog.url}</p>
-        <p>{likes} <button onClick={handleLike}>like</button></p>
+        <p>{likes} <button onClick={handleLike || defaultHandleLike}>like</button></p>
         <p>{blog.user.name}</p>
         <p>{isCreator ? <button onClick={handleRemove}>remove</button> : null}</p>
       </div>
@@ -81,7 +81,8 @@ Blog.propTypes = {
   blog: PropTypes.object.isRequired,
   blogs: PropTypes.array.isRequired,
   setBlogs: PropTypes.func.isRequired,
-  username: PropTypes.string.isRequired
+  username: PropTypes.string.isRequired,
+  handleLike: PropTypes.func
 }
 
 export default Blog

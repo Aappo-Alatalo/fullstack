@@ -40,7 +40,7 @@ test('shows url, likes and user when blogs "show" button has been pressed', asyn
       name: 'Aappo',
     }
   }
-  
+
   render(<Blog blog={blog} blogs={[]} setBlogs={() => null} username='Aappo'/>)
 
   // The things are not there before "view" button click
@@ -57,4 +57,31 @@ test('shows url, likes and user when blogs "show" button has been pressed', asyn
   expect(screen.queryByText('aappo.com')).toBeVisible()
   expect(screen.queryByText('4')).toBeVisible()
   expect(screen.queryByText('Aappo')).toBeVisible()
+})
+
+test('when "like" button is pressed twice, the callback function is called twice', async () => {
+  const blog = {
+    title: 'Component testing is done with react-testing-library',
+    author: 'Aappo testaaja',
+    url: 'aappo.com',
+    likes: 4,
+    user: {
+      username: 'logical',
+      name: 'Aappo',
+    }
+  }
+
+  const mockHandler = vi.fn()
+
+  // Render the component with our mockHandler
+  render(<Blog blog={blog} blogs={[]} setBlogs={() => null} username='Aappo' handleLike={mockHandler}/>)
+
+  // Click the "like" button twice
+  const user = userEvent.setup()
+  const likeButton = screen.getByText('like')
+  await user.click(likeButton)
+  await user.click(likeButton)
+
+  // Assert that the mockHandler was called twice
+  expect(mockHandler).toHaveBeenCalledTimes(2)
 })
