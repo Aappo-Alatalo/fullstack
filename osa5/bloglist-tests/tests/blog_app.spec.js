@@ -57,5 +57,30 @@ describe('Blog app', () => {
         const blogDiv = await page.getByTestId('blog')
         await expect(blogDiv).toContainText('A blog created by Playwright')
     })
+
+    describe('when a blog has been created', () => {
+        beforeEach(async ({ page }) => {
+            // Login
+            await page.getByTestId('usernameInput').fill('mluukkai')
+            await page.getByTestId('passwordInput').fill('salainen')
+            await page.getByTestId('submitButton').click()
+
+            // Create a blog
+            await page.getByText('new blog').click()
+            await page.getByTestId('titleInput').fill('A blog created by Playwright')
+            await page.getByTestId('authorInput').fill('John Doe')
+            await page.getByTestId('urlInput').fill('http://test.com')
+            await page.getByTestId('submitBlogButton').click()
+        })
+
+        test('blog can be liked', async ({ page }) => {
+            
+            await page.getByText('view').click()
+            await expect(page.getByText('like').locator('..')).toContainText('0')
+            await page.getByText('like').click()
+            
+            await expect(page.getByText('like').locator('..')).toContainText('1')
+        })
+    })
   })
 })
