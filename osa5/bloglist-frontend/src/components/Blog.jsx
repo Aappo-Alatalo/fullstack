@@ -71,7 +71,7 @@ const Blog = ({ blog, blogs, setBlogs, username, handleLike }) => {
         <p>{blog.url}</p>
         <p>{likes} <button onClick={handleLike || defaultHandleLike}>like</button></p>
         <p>{blog.user.name}</p>
-        <p>{isCreator ? <button onClick={handleRemove}>remove</button> : null}</p>
+        <p>{isCreator ? <button data-testid='removeButton' onClick={handleRemove}>remove</button> : null}</p>
       </div>
     </div>
   )

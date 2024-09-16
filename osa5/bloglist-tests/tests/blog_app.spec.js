@@ -74,12 +74,25 @@ describe('Blog app', () => {
         })
 
         test('blog can be liked', async ({ page }) => {
-            
             await page.getByText('view').click()
             await expect(page.getByText('like').locator('..')).toContainText('0')
             await page.getByText('like').click()
             
             await expect(page.getByText('like').locator('..')).toContainText('1')
+        })
+
+        test('blog can be removed', async ({ page }) => {
+            page.on('dialog', async (dialog) => {
+                await dialog.accept()
+            })
+
+            // Click view to show remove button
+            await page.getByText('view').click()
+            // Click the remove button
+            await page.getByTestId('removeButton').click()
+
+            const blogDiv = page.getByTestId('blog')
+            await expect(blogDiv).not.toBeVisible()
         })
     })
   })
