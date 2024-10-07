@@ -1,3 +1,5 @@
+import { createSlice } from '@reduxjs/toolkit'
+
 const anecdotesAtStart = [
   'If it hurts, do it more often',
   'Adding manpower to a late software project makes it later!',
@@ -9,25 +11,25 @@ const anecdotesAtStart = [
 
 export const getId = () => (100000 * Math.random()).toFixed(0)
 
-export const vote = (id) => {
-  return {
-    type: 'VOTE',
-    payload: {
-      id: id
-    }
-  }
-}
+// export const vote = (id) => {
+//   return {
+//     type: 'VOTE',
+//     payload: {
+//       id: id
+//     }
+//   }
+// }
 
-export const newAnecdote = (content) => {
-  return {
-    type: 'NEW_ANECDOTE',
-    payload: {
-      content: content,
-      id: getId(),
-      votes: 0
-    }
-  }
-}
+// export const newAnecdote = (content) => {
+//   return {
+//     type: 'NEW_ANECDOTE',
+//     payload: {
+//       content: content,
+//       id: getId(),
+//       votes: 0
+//     }
+//   }
+// }
 
 const asObject = (anecdote) => {
   return {
@@ -37,28 +39,58 @@ const asObject = (anecdote) => {
   }
 }
 
-const initialState = anecdotesAtStart.map(asObject)
+// const initialState = anecdotesAtStart.map(asObject)
 
-const anecdoteReducer = (state = initialState, action) => {
-  switch (action.type) {
-    case 'VOTE': {
-      const id = action.payload.id
-      const selectedAnecdote = state.find(a => a.id === id)
-      const votedAnecdote = {
-        ...selectedAnecdote,
-        votes: selectedAnecdote.votes + 1
+// const anecdoteReducer = (state = initialState, action) => {
+//   switch (action.type) {
+//     case 'VOTE': {
+//       const id = action.payload.id
+//       const selectedAnecdote = state.find(a => a.id === id)
+//       const votedAnecdote = {
+//         ...selectedAnecdote,
+//         votes: selectedAnecdote.votes + 1
+//       }
+//       // If anecdote has given id, change it to voted anecdote, else leave it alone
+//       return state.map(a =>
+//         a.id !== id ? a : votedAnecdote
+//       )
+//     }
+//     case 'NEW_ANECDOTE': {
+//       return state.concat(action.payload)
+//     }
+//     default:
+//     return state
+//   }
+// }
+
+const anecdoteSlice = createSlice({
+  name: 'anecdote',
+  initialState: anecdotesAtStart.map(asObject),
+  reducers: {
+    newAnecdote(state, action) {
+      // Can do push instead of concat thanks to IMMER
+      // ALSO returning is not allowed thanks to IMMER
+      const anecdote = {
+        content: action.payload,
+        id: getId(),
+        votes: 0,
       }
-      // If anecdote has given id, change it to voted anecdote, else leave it alone
-      return state.map(a =>
-        a.id !== id ? a : votedAnecdote
-      )
-    }
-    case 'NEW_ANECDOTE': {
-      return state.concat(action.payload)
-    }
-    default:
-    return state
-  }
-}
+      state.push(anecdote)
+    },
+    vote(state, action) {
+      const id = action.payload
+      const selectedAnecdote = state.find(a => a.id === id)
 
-export default anecdoteReducer
+      if (!selectedAnecdote) {
+        console.error(`Anecdote with id ${id} not found`)
+        return state
+      }
+
+      // Update votes for the selected anecdote
+      selectedAnecdote.votes += 1
+    },
+  },
+})
+
+export const { newAnecdote, vote } = anecdoteSlice.actions
+export default anecdoteSlice.reducer
