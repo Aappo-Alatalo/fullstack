@@ -28,17 +28,22 @@
     {
       "content": "Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.",
       "id": "98312",
-      "votes": 0
+      "votes": 1
     },
     {
       "id": "abe1",
       "content": "Hello world is impressive program to put in your CV",
-      "votes": 0
+      "votes": 30
     },
     {
       "id": "0138",
       "content": "Testi",
-      "votes": 0
+      "votes": 2
+    },
+    {
+      "id": "671c",
+      "content": "Calculator and Snake game are creative and impressive programs to add to your Curriculum Vitae",
+      "votes": 24
     }
   ]
 }
