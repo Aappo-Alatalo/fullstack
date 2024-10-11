@@ -1,6 +1,5 @@
 import { useDispatch } from 'react-redux'
-import { newAnecdote } from '../reducers/anecdoteReducer.js'
-import anecdoteService from '../services/anecdotes.js'
+import { createAnecdote } from '../reducers/anecdoteReducer.js'
 import { showNotification } from '../reducers/notificationReducer.js'
 
 const AnecdoteForm = () => {
@@ -10,10 +9,7 @@ const AnecdoteForm = () => {
     event.preventDefault()
     const content = event.target.anecdote.value
     event.target.anecdote.value = ''
-
-    const returnedAnecdote = await anecdoteService.createNew(content) // Send anecdote to cloud
-
-    dispatch(newAnecdote(returnedAnecdote))
+    dispatch(createAnecdote(content))
     dispatch(showNotification(`you added '${content}'`, 5000))
   }
 
