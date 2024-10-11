@@ -68,14 +68,7 @@ const anecdoteSlice = createSlice({
   initialState: [],
   reducers: {
     newAnecdote(state, action) {
-      // Can do push instead of concat thanks to IMMER
-      // ALSO returning is not allowed thanks to IMMER
-      const anecdote = {
-        content: action.payload,
-        id: getId(),
-        votes: 0,
-      }
-      state.push(anecdote)
+      state.push(action.payload)
     },
     vote(state, action) {
       const id = action.payload
