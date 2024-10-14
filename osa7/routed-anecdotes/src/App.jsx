@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import {
   Routes, Route, Link,
-  useParams, useMatch
+  useMatch,
+  useNavigate
 } from 'react-router-dom'
 
 const Menu = () => {
@@ -43,7 +44,7 @@ const About = () => (
 const AnecdoteInfo = ({ anecdote }) => {
   return (
     <>
-      <h2>{anecdote.content}</h2>
+      <h2>{anecdote.content} by {anecdote.author}</h2>
       <p>has {anecdote.votes} votes</p>
       <p>for more info see <a href={anecdote.info}>{anecdote.info}</a></p>
     </>
@@ -63,6 +64,8 @@ const CreateNew = (props) => {
   const [author, setAuthor] = useState('')
   const [info, setInfo] = useState('')
 
+  const navigate = useNavigate()
+
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -72,6 +75,8 @@ const CreateNew = (props) => {
       info,
       votes: 0
     })
+    navigate('/')
+    props.notify(`a new anecdote ${content} created!`)
   }
 
   return (
@@ -95,6 +100,14 @@ const CreateNew = (props) => {
     </div>
   )
 
+}
+
+const Notification = ({ notification }) => {
+  return (
+    <>
+      <p>{notification}</p>
+    </>
+  )
 }
 
 const App = () => {
@@ -136,24 +149,30 @@ const App = () => {
     setAnecdotes(anecdotes.map(a => a.id === id ? voted : a))
   }
 
+  const notify = (message) => {
+    setNotification(message)
+    setTimeout(() => {
+      setNotification('')
+    }, 5000)
+  }
+
   const match = useMatch('/anecdotes/:id')
   const anecdote = match 
     ? anecdotes.find(anec => anec.id === Number(match.params.id))
     : null
-
-  console.log(anecdote)
 
 
   return (
     <>
       <h1>Software anecdotes</h1>
       <Menu />
+      <Notification notification={notification} />
 
       <Routes>
         <Route path="/anecdotes/:id" element={<AnecdoteInfo anecdote={anecdote} />} />
 
         <Route path='/' element={<AnecdoteList anecdotes={anecdotes} />}/>
-        <Route path='/create' element={<CreateNew addNew={addNew} />}/>
+        <Route path='/create' element={<CreateNew addNew={addNew} notify={notify} />}/>
         <Route path='/about' element={<About />}/>
       </Routes>
 
