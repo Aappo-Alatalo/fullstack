@@ -3,26 +3,21 @@ import Blog from "./components/Blog"
 import Togglable from "./components/Togglable"
 import BlogForm from "./components/BlogForm"
 import LoginForm from "./components/LoginForm"
+import Notification from "./components/Notification"
 import blogService from "./services/blogs"
 import loginService from "./services/login"
 
-const Notification = ({ message, type }) => {
-  if (message === null || type === null) {
-    return null
-  }
-
-  return <div className={type}>{message}</div>
-}
+import { useNotificationDispatcher } from "./contexts/NotificationContext"
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [notificationMessage, setNotificationMessage] = useState(null)
-  const [notificationType, setNotificationType] = useState(null)
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [user, setUser] = useState(null)
 
   const blogFormRef = useRef()
+
+  const dispatchNotification = useNotificationDispatcher()
 
   useEffect(() => {
     const fetchBlogs = async () => {
@@ -62,11 +57,17 @@ const App = () => {
       setUsername("")
       setPassword("")
     } catch (exception) {
-      setNotificationMessage("wrong username or password")
-      setNotificationType("error")
+      dispatchNotification({
+        type: "SET_NOTIFICATION",
+        payload: {
+          text: "wrong username or password",
+          type: "error",
+        },
+      })
       setTimeout(() => {
-        setNotificationMessage(null)
-        setNotificationType(null)
+        dispatchNotification({
+          type: "CLEAR_NOTIFICATION",
+        })
       }, 5000)
     }
   }
@@ -80,22 +81,25 @@ const App = () => {
     }
 
     setBlogs(blogs.concat(completedBlog))
-
-    setNotificationMessage(
-      `a new blog ${blogObject.title} by ${blogObject.author} added`,
-    )
-    setNotificationType("success")
-    setTimeout(() => {
-      setNotificationMessage(null)
-      setNotificationType(null)
-    }, 5000)
-
     blogFormRef.current.toggleVisibility()
+
+    dispatchNotification({
+      type: "SET_NOTIFICATION",
+      payload: {
+        text: `a new blog ${completedBlog.title} by ${completedBlog.author} added`,
+        type: "success",
+      },
+    })
+    setTimeout(() => {
+      dispatchNotification({
+        type: "CLEAR_NOTIFICATION",
+      })
+    }, 5000)
   }
 
   return (
     <div>
-      <Notification message={notificationMessage} type={notificationType} />
+      <Notification />
 
       {!user && (
         <LoginForm

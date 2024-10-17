@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { type } from "@testing-library/user-event/dist/cjs/utility/type.js"
 
 const BlogForm = ({ createBlog }) => {
   const [newBlogTitle, setNewBlogTitle] = useState("")
@@ -17,6 +18,7 @@ const BlogForm = ({ createBlog }) => {
     setNewBlogAuthor("")
     setNewBlogURL("")
   }
+
   return (
     <>
       <h2>create new</h2>
