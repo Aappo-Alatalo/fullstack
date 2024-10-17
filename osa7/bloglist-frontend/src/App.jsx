@@ -7,31 +7,26 @@ import Notification from "./components/Notification"
 import blogService from "./services/blogs"
 import loginService from "./services/login"
 
+import { updateBlogLikes } from "./requests"
+
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+
 import { useNotificationDispatcher } from "./contexts/NotificationContext"
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
+  const queryClient = useQueryClient()
+  const dispatchNotification = useNotificationDispatcher()
+
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [user, setUser] = useState(null)
 
   const blogFormRef = useRef()
 
-  const dispatchNotification = useNotificationDispatcher()
-
-  useEffect(() => {
-    const fetchBlogs = async () => {
-      try {
-        const fetchedBlogs = await blogService.getAll()
-        const sortedBlogs = fetchedBlogs.sort((a, b) => b.likes - a.likes)
-        setBlogs(sortedBlogs)
-      } catch (error) {
-        console.error("Error fetching blogs:", error)
-      }
-    }
-
-    fetchBlogs()
-  }, [])
+  const updateBlogMutation = useMutation({
+    mutationFn: updateBlogLikes,
+    onSuccess: queryClient.invalidateQueries({ queryKey: ["blogs"] }),
+  })
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser")
@@ -41,6 +36,26 @@ const App = () => {
       blogService.setToken(user.token)
     }
   }, [])
+
+  const {
+    data: blogs = [],
+    error,
+    isLoading,
+  } = useQuery({
+    queryKey: ["blogs"],
+    queryFn: async () => {
+      const fetchedBlogs = await blogService.getAll()
+      return fetchedBlogs.sort((a, b) => b.likes - a.likes)
+    },
+  })
+
+  if (isLoading) {
+    return <div>Loading blogs...</div>
+  }
+
+  if (error) {
+    return <div>Error fetching blogs: {error.message}</div>
+  }
 
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -72,31 +87,6 @@ const App = () => {
     }
   }
 
-  const addBlog = async (blogObject) => {
-    const returnedBlog = await blogService.create(blogObject)
-
-    const completedBlog = {
-      ...returnedBlog,
-      user: user,
-    }
-
-    setBlogs(blogs.concat(completedBlog))
-    blogFormRef.current.toggleVisibility()
-
-    dispatchNotification({
-      type: "SET_NOTIFICATION",
-      payload: {
-        text: `a new blog ${completedBlog.title} by ${completedBlog.author} added`,
-        type: "success",
-      },
-    })
-    setTimeout(() => {
-      dispatchNotification({
-        type: "CLEAR_NOTIFICATION",
-      })
-    }, 5000)
-  }
-
   return (
     <div>
       <Notification />
@@ -117,14 +107,13 @@ const App = () => {
           {user.name} logged in
           <button onClick={() => window.localStorage.clear()}>logout</button>
           <Togglable buttonLabel="new blog" ref={blogFormRef}>
-            <BlogForm createBlog={addBlog} />
+            <BlogForm blogFormRef={blogFormRef} />
           </Togglable>
           {blogs.map((blog) => (
             <Blog
               key={blog.id}
               blog={blog}
-              blogs={blogs}
-              setBlogs={setBlogs}
+              updateBlogMutation={updateBlogMutation}
               username={user.username}
             />
           ))}

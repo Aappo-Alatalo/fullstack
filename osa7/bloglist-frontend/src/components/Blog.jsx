@@ -1,10 +1,12 @@
 import { useState } from "react"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import blogService from "../services/blogs"
 import PropTypes from "prop-types"
 
-const Blog = ({ blog, blogs, setBlogs, username, handleLike }) => {
+const Blog = ({ blog, updateBlogMutation, username }) => {
+  const queryClient = useQueryClient()
+
   const [visible, setVisible] = useState(false)
-  const [likes, setLikes] = useState(blog.likes)
 
   const hideWhenVisible = { display: visible ? "none" : "" }
   const showWhenVisible = { display: visible ? "" : "none" }
@@ -13,38 +15,23 @@ const Blog = ({ blog, blogs, setBlogs, username, handleLike }) => {
     setVisible(!visible)
   }
 
-  const defaultHandleLike = async () => {
-    const updatedBlog = {
-      ...blog,
-      likes: likes + 1,
-    }
-
-    try {
-      const returnedBlog = await blogService.update(blog.id, updatedBlog)
-      // This is the fix for 5.9*
-      const completedBlog = {
-        ...returnedBlog,
-        user: blog.user,
-      }
-
-      const updatedBlogs = blogs.map((b) =>
-        b.id === blog.id ? completedBlog : b,
-      )
-      const sortedBlogs = updatedBlogs.sort((a, b) => b.likes - a.likes)
-      setLikes(likes + 1)
-      setBlogs(sortedBlogs)
-    } catch (error) {
-      console.log(error)
-    }
+  const handleLike = async () => {
+    updateBlogMutation.mutate(blog)
   }
+
+  const deleteBlogMutation = useMutation({
+    mutationFn: (blogId) => blogService.remove(blogId),
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: ["blogs"] })
+    },
+  })
 
   const handleRemove = async () => {
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
       try {
-        const returnedBlog = await blogService.remove(blog.id)
-        console.log(returnedBlog)
-
-        setBlogs(blogs.filter((b) => b.id !== blog.id))
+        // Call the mutate function from the mutation
+        await deleteBlogMutation.mutateAsync(blog.id)
       } catch (error) {
         console.error("Error deleting blog:", error)
       }
@@ -71,8 +58,7 @@ const Blog = ({ blog, blogs, setBlogs, username, handleLike }) => {
         <button onClick={toggleVisibility}>hide</button>
         <p>{blog.url}</p>
         <p>
-          {likes}{" "}
-          <button onClick={handleLike || defaultHandleLike}>like</button>
+          {blog.likes} <button onClick={handleLike}>like</button>
         </p>
         <p>{blog.user.name}</p>
         <p>
@@ -89,8 +75,6 @@ const Blog = ({ blog, blogs, setBlogs, username, handleLike }) => {
 
 Blog.propTypes = {
   blog: PropTypes.object.isRequired,
-  blogs: PropTypes.array.isRequired,
-  setBlogs: PropTypes.func.isRequired,
   username: PropTypes.string.isRequired,
   handleLike: PropTypes.func,
 }
