@@ -3,6 +3,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import blogService from "../services/blogs"
 import PropTypes from "prop-types"
 
+import { Button } from "react-bootstrap"
+
 const Blog = ({ blog, updateBlogMutation, username }) => {
   const queryClient = useQueryClient()
 
@@ -49,27 +51,34 @@ const Blog = ({ blog, updateBlogMutation, username }) => {
   }
 
   return (
-    <div data-testid="blog" style={blogStyle}>
+    <td data-testid="blog" style={blogStyle}>
       {blog.title} {blog.author}
       <div style={hideWhenVisible}>
-        <button onClick={toggleVisibility}>view</button>
+        <Button onClick={toggleVisibility}>view</Button>
       </div>
       <div style={showWhenVisible}>
-        <button onClick={toggleVisibility}>hide</button>
+        <Button onClick={toggleVisibility}>hide</Button>
         <p>{blog.url}</p>
         <p>
-          {blog.likes} <button onClick={handleLike}>like</button>
+          {blog.likes}{" "}
+          <Button variant="success" onClick={handleLike}>
+            like
+          </Button>
         </p>
         <p>{blog.user.name}</p>
         <p>
           {isCreator ? (
-            <button data-testid="removeButton" onClick={handleRemove}>
+            <Button
+              variant="danger"
+              data-testid="removeButton"
+              onClick={handleRemove}
+            >
               remove
-            </button>
+            </Button>
           ) : null}
         </p>
       </div>
-    </div>
+    </td>
   )
 }
 

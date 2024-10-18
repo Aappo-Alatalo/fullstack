@@ -13,6 +13,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 
 import { useNotificationDispatcher } from "./contexts/NotificationContext"
 
+import { Table, Button } from "react-bootstrap"
+
 const App = () => {
   const queryClient = useQueryClient()
   const dispatchNotification = useNotificationDispatcher()
@@ -88,7 +90,7 @@ const App = () => {
   }
 
   return (
-    <div>
+    <div className="container">
       <Notification />
 
       {!user && (
@@ -105,18 +107,24 @@ const App = () => {
         <div>
           <h2>blogs</h2>
           {user.name} logged in
-          <button onClick={() => window.localStorage.clear()}>logout</button>
+          <Button onClick={() => window.localStorage.clear()}>logout</Button>
           <Togglable buttonLabel="new blog" ref={blogFormRef}>
             <BlogForm blogFormRef={blogFormRef} />
           </Togglable>
-          {blogs.map((blog) => (
-            <Blog
-              key={blog.id}
-              blog={blog}
-              updateBlogMutation={updateBlogMutation}
-              username={user.username}
-            />
-          ))}
+          <Table style={{ margin: "20px" }} hover>
+            <tbody>
+              {blogs.map((blog) => (
+                <tr key={blog.id}>
+                  <Blog
+                    // key={blog.id}
+                    blog={blog}
+                    updateBlogMutation={updateBlogMutation}
+                    username={user.username}
+                  />
+                </tr>
+              ))}
+            </tbody>
+          </Table>
         </div>
       )}
     </div>

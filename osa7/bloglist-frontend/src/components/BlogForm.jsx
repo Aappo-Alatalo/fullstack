@@ -2,6 +2,7 @@ import { useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import blogService from "../services/blogs"
 import { useNotificationDispatcher } from "../contexts/NotificationContext"
+import { Button } from "react-bootstrap"
 
 const BlogForm = ({ blogFormRef }) => {
   const queryClient = useQueryClient()
@@ -52,7 +53,7 @@ const BlogForm = ({ blogFormRef }) => {
     <>
       <h2>create new</h2>
       <form onSubmit={onCreate}>
-        <div>
+        <div style={{ marginTop: "10px" }}>
           title:
           <input
             data-testid="titleInput"
@@ -61,7 +62,7 @@ const BlogForm = ({ blogFormRef }) => {
             onChange={(e) => setNewBlogTitle(e.target.value)}
           />
         </div>
-        <div>
+        <div style={{ marginTop: "10px" }}>
           author:
           <input
             data-testid="authorInput"
@@ -70,7 +71,7 @@ const BlogForm = ({ blogFormRef }) => {
             onChange={(e) => setNewBlogAuthor(e.target.value)}
           />
         </div>
-        <div>
+        <div style={{ marginTop: "10px" }}>
           url:
           <input
             data-testid="urlInput"
@@ -79,13 +80,14 @@ const BlogForm = ({ blogFormRef }) => {
             onChange={(e) => setNewBlogURL(e.target.value)}
           />
         </div>
-        <button
+        <Button
+          style={{ marginTop: "10px" }}
           data-testid="submitBlogButton"
           id="submitBlogButton"
           type="submit"
         >
           create
-        </button>
+        </Button>
       </form>
     </>
   )
